@@ -1,0 +1,1215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano version="1.19">
+
+  <!-- unsupported kind of display : PointMap -->
+
+
+  
+  <!-- Spot Style - Default Polygon Spot Style -->
+  <style name="PolygonDefaultPolygonSpotStyle"
+           visible="false"
+           bordercolor="0xffffff"
+           fillcolor="0xffffff"
+           borderwidth="0"
+           borderalpha="1"
+           fillalpha="0.40000000000000002"
+           capture="false"
+           onhover="onhoverPolygonDefaultPolygonSpotStyle"
+           onover="onoverPolygonDefaultPolygonSpotStyle"
+           onout="onoutPolygonDefaultPolygonSpotStyle"
+           />
+  <action name="onhoverPolygonDefaultPolygonSpotStyle">
+    showTooltip('hotspot');
+  </action>
+
+  <action name="onoverPolygonDefaultPolygonSpotStyle">
+    set(borderwidth, 0);
+  </action>
+
+  <action name="onoutPolygonDefaultPolygonSpotStyle">
+
+    set(borderwidth, 0);
+    hideTooltip();
+  </action>
+
+
+
+<!-- ********** -->
+<!-- Context menu -->
+<!-- id : contextmenu -->
+<!-- ********** -->
+  <contextmenu fullscreen="false" versioninfo="false" touch="true">
+    <item name="normal"        onclick="setViewNormal();
+" separator="true"/>
+    <item name="architectural" onclick="setViewArchitectural();
+"/>
+    <item name="littleplanet"  onclick="setViewLittlePlanet();
+"/>
+    <item name="fullscreenentry" onclick="enterFullscreen();
+" separator="true"/>
+  </contextmenu>
+
+  <events name="contextmenuevents" keep="true" 
+    onenterfullscreen="updateContextMenu" onexitfullscreen="updateContextMenu" 
+    onxmlcomplete="updateContextMenu" 
+    changetourlanguage="updateContextMenu" 
+    />
+  <events name="contextmenuvrevents" keep="true" 
+    onvravailable="updateContextMenu();" onvrunavailable="updateContextMenu();"
+    devices="html5"
+    />
+  <action name="updateContextMenu">
+    getmessage(contextmenu.item[normal].caption, contextmenunormallabel);
+    getmessage(contextmenu.item[architectural].caption, contextmenuarchitecturallabel);
+    set(sceneisfull360, false);
+    if(scene[get(xml.scene)].full360,
+      sub(viewhfov, panoview.hmax, panoview.hmin);
+      if (viewhfov == 360,
+        sub(viewvfov, panoview.vmax, panoview.vmin);
+        if (viewvfov == 180,
+          set(sceneisfull360, true);
+        );
+      );
+    );
+    if (sceneisfull360 AND (device.webgl OR device.flash),
+      set(contextmenu.item[littleplanet].visible, true);
+      getmessage(contextmenu.item[littleplanet].caption, contextmenulittleplanetlabel);
+    ,
+      set(contextmenu.item[littleplanet].visible, false);
+    );
+    if (device.fullscreensupport,
+      if(tour_fullscreen,
+        getmessage(contextmenu.item[fullscreenentry].caption, contextmenucloseFsLabel);
+        set(contextmenu.item[fullscreenentry].onclick, exitFullscreen();
+);
+       ,
+        getmessage(contextmenu.item[fullscreenentry].caption, contextmenuopenFsLabel);
+        set(contextmenu.item[fullscreenentry].onclick, enterFullscreen();
+);
+      );
+     ,
+      set(contextmenu.item[fullscreenentry].visible, false);
+    );
+  </action>
+
+<!-- ********** -->
+<!-- iControl Bar -->
+<!-- id : controlBar_i -->
+<!-- ********** -->
+
+  <krpano controlBar_ibarbuilt="false" controlBar_ibackgroundwidthwhenclosed="0" controlBar_ibackgroundwidthwhenopened="0" controlBar_iIsOpened="false" />
+  <events name="controlBar_ievents" 
+    onxmlcomplete="controlBar_ibuildMenuBar();" 
+
+
+    keep="true" />
+
+
+
+  <action name="controlBar_ibuildMenuBar">
+    ifnot (controlBar_ibarbuilt, controlBar_ibuildMenu(); set(controlBar_ibarbuilt, true););
+  </action>
+
+  <style name="controlBar_i_btn_style"
+         keep="true"
+         edge="right"
+         align="right"
+         x="0" y="0"
+         width="40" height="40"
+         crop="0|0|60|60"
+         onovercrop="0|60|60|60"
+         ondowncrop="0|120|60|60"
+         />
+  <style name="controlBar_i_btn_style_off"
+         keep="true"
+         edge="right"
+         align="right"
+         x="0" y="0"
+         width="40" height="40"
+         />
+
+  <layer name="controlBar_i_menu_bg"
+         keep="true"
+         type="container"
+         zorder="2"
+         width="40"
+         height="40"
+         align="bottom"
+         x="10" y="10"
+         maskchildren="true"
+         rotate="0"
+         visible="false"
+         >
+
+
+    <layer name="controlBar_ibtn_ctrlmode_move_to"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_move_to.png"
+            style="controlBar_i_btn_style"
+            onclick="setControlModeMoveTo();
+"
+            visible="false"
+            devices="desktop"
+            />
+    <layer name="controlBar_ibtn_ctrlmode_drag_to"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_drag_to.png"
+            style="controlBar_i_btn_style"
+            onclick="setControlModeDragTo();
+"
+            visible="false"
+            devices="desktop"
+            />
+
+
+
+
+    <layer name="controlBar_ibtn_display_map"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_map.png"
+            onclick="controlBar_idisplayMap();"
+            style="controlBar_i_btn_style"
+            visible="false"
+            />
+    <layer name="controlBar_ibtn_hide_map"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_map.png"
+            onclick="controlBar_ihideMap();"
+            style="controlBar_i_btn_style"
+            visible="false"
+            />
+
+
+    <layer name="controlBar_ibtn_openfs"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_enter_fs.png"
+            onclick="enterFullscreen();
+"
+            style="controlBar_i_btn_style"
+            visible="false"
+            devices="fullscreensupport"
+            />
+    <layer name="controlBar_ibtn_closefs"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_close_fs.png"
+            onclick="exitFullscreen();
+"
+            style="controlBar_i_btn_style"
+            visible="false"
+            devices="fullscreensupport"
+            />
+
+
+
+
+    <layer name="controlBar_ibtn_display_info"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_info.png"
+            onclick="showTourInfo();
+"
+            style="controlBar_i_btn_style"
+            visible="false"
+            />
+
+    <layer name="controlBar_ibtn_close_info"
+            url="%FIRSTXML%/graphics/icontrolbar/btn_info.png"
+            onclick="hideTourInfo();
+"
+            style="controlBar_i_btn_style"
+            visible="false"
+            />
+
+
+ </layer>
+
+
+
+
+
+	<events name="controlBar_icontrolmodechangedevent" 
+		oncontrolmodechanged="controlBar_iupdateControlModeButtons();" 
+		keep="true" />
+	<action name="controlBar_iHideControlModeButtons">
+		set(layer[controlBar_ibtn_ctrlmode_move_to].visible, false);
+		set(layer[controlBar_ibtn_ctrlmode_drag_to].visible, false);
+	</action>
+	<action name="controlBar_iShowControlModeButtons">
+		if (tour_controlmodemousetype == "moveto",
+			set(layer[controlBar_ibtn_ctrlmode_drag_to].visible, true);
+			set(layer[controlBar_ibtn_ctrlmode_move_to].visible, false);
+		,
+			set(layer[controlBar_ibtn_ctrlmode_move_to].visible, true);
+			set(layer[controlBar_ibtn_ctrlmode_drag_to].visible, false);
+		);
+	</action>
+	<action name="controlBar_iupdateControlModeButtons">
+	if (device.desktop,
+		if (controlBar_iIsOpened,
+			controlBar_iShowControlModeButtons();
+		,
+			controlBar_iHideControlModeButtons();
+		);
+	,
+		controlBar_iHideControlModeButtons();
+	);
+	</action>
+
+
+  <action name="controlBar_ihideMenuControls">
+    set(controlBar_iIsOpened, false);
+
+
+	controlBar_iupdateFullscreenButtons();
+
+	controlBar_iupdateInfoButtons();
+
+
+
+	controlBar_iupdateControlModeButtons();
+
+	controlBar_iupdateMapButtons();
+
+
+
+	set(layer[controlBar_i_menu_bg].width, get(controlBar_ibackgroundwidthwhenclosed));
+
+	set(layer[controlBar_i_menu_bg].visible, true);
+  </action>
+  <action name="controlBar_ishowMenuControls">
+    set(controlBar_iIsOpened, true);
+	set(layer[controlBar_i_menu_bg].visible, true);
+
+
+	controlBar_iupdateFullscreenButtons();
+
+	controlBar_iupdateInfoButtons();
+
+
+
+	controlBar_iupdateControlModeButtons();
+
+	controlBar_iupdateMapButtons();
+
+
+    set(layer[controlBar_i_menu_bg].width, get(controlBar_ibackgroundwidthwhenopened));
+  </action>
+
+
+	<events name="controlBar_ihideshowinfoevent" 
+		onhidetourinfo="controlBar_iupdateInfoButtons();" 
+		onshowtourinfo="controlBar_iupdateInfoButtons();" 
+		keep="true" />
+	<action name="controlBar_iHideInfoButtons">
+		set(layer[controlBar_ibtn_display_info].visible, false);
+		set(layer[controlBar_ibtn_close_info].visible, false);
+	</action>
+	<action name="controlBar_iShowInfoButtons">
+		if (tour_displayinfo,
+			set(layer[controlBar_ibtn_close_info].visible, true);
+			set(layer[controlBar_ibtn_display_info].visible, false);
+		,
+			set(layer[controlBar_ibtn_display_info].visible, true);
+			set(layer[controlBar_ibtn_close_info].visible, false);
+		);
+	</action>
+	<action name="controlBar_iupdateInfoButtons">
+		if (controlBar_iIsOpened,
+			controlBar_iShowInfoButtons();
+		,
+			controlBar_iHideInfoButtons();
+		);
+	</action>
+
+  <action name="controlBar_idisplayMap">showMap();
+
+  </action>
+  <action name="controlBar_ihideMap">hideMap();
+
+  </action>
+  
+  <events name="controlBar_idisplaymapchangeevent"
+          onshowtourmap="controlBar_iupdateMapButtons();"
+          onhidetourmap="controlBar_iupdateMapButtons();"
+          keep="true"/>
+	<action name="controlBar_iHideMapButtons">
+		set(layer[controlBar_ibtn_display_map].visible, false);
+		set(layer[controlBar_ibtn_hide_map].visible, false);
+	</action>
+	<action name="controlBar_iShowMapButtons">
+		if (tour_displaymap,
+			set(layer[controlBar_ibtn_hide_map].visible, true);
+			set(layer[controlBar_ibtn_display_map].visible, false);
+		,
+			set(layer[controlBar_ibtn_display_map].visible, true);
+			set(layer[controlBar_ibtn_hide_map].visible, false);
+		);
+	</action>
+	<action name="controlBar_iupdateMapButtons">
+		if (controlBar_iIsOpened,
+			controlBar_iShowMapButtons();
+		,
+			controlBar_iHideMapButtons();
+		);
+	</action>
+
+
+
+  <events name="controlBar_imenufullscreenchangeevent"
+          onenterfullscreen="controlBar_iupdateFullscreenButtons();"
+          onexitfullscreen="controlBar_iupdateFullscreenButtons();"
+          keep="true"/>
+	<action name="controlBar_iHideFullscreenButtons">
+		set(layer[controlBar_ibtn_openfs].visible , false);
+		set(layer[controlBar_ibtn_closefs].visible, false);
+	</action>
+	<action name="controlBar_iShowFullscreenButtons">
+		if (device.fullscreensupport,
+			if(tour_fullscreen,
+				set(layer[controlBar_ibtn_openfs].visible , false);
+				set(layer[controlBar_ibtn_closefs].visible, true);
+			,
+				set(layer[controlBar_ibtn_openfs].visible ,true);
+				set(layer[controlBar_ibtn_closefs].visible,false);
+			);
+		,
+			controlBar_iHideFullscreenButtons();
+		);
+	</action>
+	<action name="controlBar_iupdateFullscreenButtons">
+		if (controlBar_iIsOpened,
+			controlBar_iShowFullscreenButtons();
+		,
+			controlBar_iHideFullscreenButtons();
+		);
+	</action>
+
+
+
+  <action name="controlBar_ibuildMenu">
+    
+    set(controlBar_ibutton_pos, 0);
+
+
+    set(layer[controlBar_ibtn_display_info].x, get(controlBar_ibutton_pos));
+    set(layer[controlBar_ibtn_close_info].x  , get(controlBar_ibutton_pos));
+    inc(controlBar_ibutton_pos, 45);
+
+
+      if (device.fullscreensupport,
+        set(layer[controlBar_ibtn_openfs].x , get(controlBar_ibutton_pos));
+        set(layer[controlBar_ibtn_closefs].x, get(controlBar_ibutton_pos));
+        inc(controlBar_ibutton_pos, 45);
+      );
+
+
+      set(layer[controlBar_ibtn_display_map].x , get(controlBar_ibutton_pos));
+      set(layer[controlBar_ibtn_hide_map].x    , get(controlBar_ibutton_pos));
+      inc(controlBar_ibutton_pos, 45);
+
+
+
+
+    if (device.desktop,
+      set(layer[controlBar_ibtn_ctrlmode_drag_to].x, get(controlBar_ibutton_pos));
+      set(layer[controlBar_ibtn_ctrlmode_move_to].x, get(controlBar_ibutton_pos));
+      inc(controlBar_ibutton_pos, 45);
+    );
+
+
+
+
+
+
+
+      dec(controlBar_ibutton_pos, 5);
+
+      set(controlBar_ibackgroundwidthwhenopened, get(controlBar_ibutton_pos));
+
+
+    
+      set(layer[controlBar_i_menu_bg].width, get(controlBar_ibackgroundwidthwhenopened));
+	
+	
+	
+    </action>
+
+	<events name="controlBar_iStartTourEvents" onTourStart="controlBar_iCallOnStartTour();" keep="true" />
+	
+	<action name="controlBar_iCallOnStartTour">
+		
+		controlBar_ishowMenuControls();
+	</action>
+
+
+
+<!-- ********** -->
+<!-- Panorama Combobox -->
+<!-- id : panoramacombobox -->
+<!-- ********** -->
+
+<events name="panoramacomboboxStartTourEvents" onTourStart="set(layer[panoramacombobox].isStarted, true);if(layer[panoramacombobox].isLoaded,panoramacomboboxShow(););" keep="true" />
+
+
+  <layer name="panoramacombobox"
+         url="%FIRSTXML%/graphics/combobox.swf"
+         alturl="%FIRSTXML%/graphics/combobox.js"
+         keep="true"
+         visible="false"
+         zorder="3"
+         align="top"
+         x="5" y="10"
+         rowcount="10"
+         onloaded="panoramacomboboxLoaded();"
+         isStarted="false"
+         isLoaded="false"
+         itemcount="0"
+         itemfontsize.normal="14"
+         itempadding.normal="8"
+         itemfontsize.mobile="11"
+         itempadding.mobile="5"
+         cbdesignscale.mobile="1"
+         />
+
+  <action name="panoramacomboboxLoaded">
+    
+    layer[panoramacombobox].removeAll();
+    set(layer[panoramacombobox].itemcount, 0);
+    
+    panoramacomboboxAddItem(panogroup66_title, panogroup66, pano63, false);
+    panoramacomboboxAddItem(pano63_title, pano63, pano63, true);
+    panoramacomboboxAddItem(pano64_title, pano64, pano64, true);
+    panoramacomboboxAddItem(pano65_title, pano65, pano65, true);
+    panoramacomboboxAddItem(pano61_title, pano61, pano61, true);
+    set(layer[panoramacombobox].isLoaded, true);
+    
+    if(layer[panoramacombobox].isStarted,
+      panoramacomboboxShow();
+    );
+  </action>
+
+
+  <action name="panoramacomboboxAddItem">
+    getmessage(caption, %1);
+    
+    indexoftxt(found, get(caption), '&amp;');
+    if(found GE 0,
+      subtxt(part1, get(caption), 0, get(found));
+      add(found, 1);
+      subtxt(part2, get(caption), get(found), get(caption.length));
+      txtadd(caption, get(part1), '&amp;', get(part2));
+    );
+    if(%4,
+      txtadd(title, "&#x00A0;&#x00A0;&#x00A0;", get(caption));
+    ,
+      set(title, get(caption));
+    );
+    layer[panoramacombobox].addIdItem(%2, get(title), mainloadscene(%3));
+    inc(layer[panoramacombobox].itemcount);
+  </action>
+
+  <action name="panoramacomboboxUpdateLanguage">
+    layer[panoramacombobox].closeList();
+    layer[panoramacombobox].removeAll();
+    set(layer[panoramacombobox].itemcount, 0);
+
+    panoramacomboboxAddItem(panogroup66_title, panogroup66, pano63, false);
+    panoramacomboboxAddItem(pano63_title, pano63, pano63, true);
+    panoramacomboboxAddItem(pano64_title, pano64, pano64, true);
+    panoramacomboboxAddItem(pano65_title, pano65, pano65, true);
+    panoramacomboboxAddItem(pano61_title, pano61, pano61, true);
+
+    panoramacomboboxUpdateList();
+  </action>
+
+  <events name="panoramacomboboxEvents"
+          hidetourcontrols="panoramacomboboxHide();"
+          showtourcontrols="panoramacomboboxShow();"
+          onnewpano="panoramacomboboxOnPanorama();"
+          changetourlanguage="panoramacomboboxUpdateLanguage();"
+          keep="true"/>
+
+  <action name="panoramacomboboxHide">
+    set(layer[panoramacombobox].visible, false);
+  </action>
+  <action name="panoramacomboboxShow">
+  if(layer[panoramacombobox].isLoaded,
+    if (layer[panoramacombobox].itemcount GT 0,
+      set(layer[panoramacombobox].visible, true);
+    ,
+      set(layer[panoramacombobox].visible, false);
+    );
+  ,
+    set(layer[panoramacombobox].visible, false);
+  );
+  </action>
+
+  <action name="panoramacomboboxOnPanorama">
+    if(layer[panoramacombobox].isLoaded,
+      panoramacomboboxUpdateList();
+    ,
+      delayedcall(0.2, panoramacomboboxOnPanorama);
+    );
+  </action>
+
+
+  <action name="panoramacomboboxUpdateList">
+    set(itemtoselect, get(scene[get(xml.scene)].name));
+    layer[panoramacombobox].selectIdItem(get(itemtoselect));
+  </action>
+
+
+<!-- ********** -->
+<!-- Описание -->
+<!-- id : description -->
+<!-- ********** -->
+
+<ptplugin name="description" canStart="false" newPano="false" openatstart="false" mode="panorama" startMethod="showDescription_description" engine="kolorArea">
+	<settings>
+		<option name="position" value="left" type="string" />
+		<option name="start_position" value="left" type="string" />
+		<option name="margin_x" value="25" type="int" />
+		<option name="margin_y" value="0" type="int" />
+		<option name="background_color" value="ffffff" type="string" />
+		<option name="background_alpha" value="0.50000762951094835" type="float" />
+		<option name="topleft_radius" value="0" type="int" />
+		<option name="topright_radius" value="0" type="int" />
+		<option name="bottomleft_radius" value="0" type="int" />
+		<option name="bottomright_radius" value="0" type="int" />
+		<option name="area_border_width" value="0" type="int" />
+		<option name="area_border_color" value="000000" type="string" />
+		<option name="area_border_alpha" value="0" type="float" />
+		<option name="padding" value="15" type="int" />
+		<option name="display_title" value="false" type="bool" />
+		<option name="close_displayed" value="false" type="bool" />
+		<option name="close_text" value="descriptiondisplay_close_text" type="string" />
+
+		<option name="overlay_displayed" value="false" type="bool" />
+		<option name="overlay_color" value="000000" type="string" />
+		<option name="overlay_alpha" value="0.50000762951094835" type="float" />
+
+		<option name="area_width" value="400" type="int" />
+		<option name="area_height" value="80" type="int" />
+		<option name="area_width_unit" value="pixel" type="string" />
+		<option name="area_height_unit" value="percent" type="string" />
+		<option name="animation" value="true" type="bool" />
+		<option name="animation_duration" value="500" type="int" />
+		<option name="refresh_content" value="true" type="bool" />
+		<option name="close_callback" value="invokeKrFunction('closeKolorAreaCallback_description')" type="string" />
+		<option name="close_on_click" value="false" type="bool" />
+		<option name="zorder" value="4" type="int" />
+		<option name="use_i18n" value="true" type="bool" />
+	</settings>
+</ptplugin>
+
+<action name="kolorAreaJsReady_description">
+	set(ptplugin[description].jsready, true);
+
+</action>
+
+
+<action name="openKolorArea_description">
+	ifnot(ptplugin[description].isOpen,
+		set(ptplugin[description].isOpen, true);
+		
+		js(showKolorArea(description, get(ptplugin[description].descID)));
+		events.dispatch(onremovedisplayedobject);
+	);
+</action>
+
+<action name="closeKolorArea_description">
+	if(ptplugin[description].isOpen,
+		js(invokePluginFunction(description, closeKolorArea));
+	);
+</action>
+
+<action name="toggleKolorArea_description">
+	if(ptplugin[description].isOpen,
+		closeKolorArea_description();
+	,
+		openKolorArea_description();
+	);
+</action>
+
+<action name="closeKolorAreaCallback_description">
+	set(ptplugin[description].isOpen, false);
+	if(tour_displayinfo,hideTourInfo();
+
+	);
+</action>
+
+
+
+<action name="showKolorArea_description">
+	ifnot(ptplugin[description].startMethod == "",
+		delayedcall(0,get(ptplugin[description].startMethod));
+	,
+		set(ptplugin[description].isOpen, true);
+		
+		js(invokePluginFunction(description, showKolorArea, %1));
+		events.dispatch(onremovedisplayedobject);
+	);
+</action>
+	
+<action name="hideKolorArea_description">
+	
+	set(ptplugin[description].isOpen, false);
+	js(invokePluginFunction(description, hideKolorArea, %1));
+</action>
+
+<action name="openDescription_description">
+	openKolorArea_description();
+</action>
+
+<action name="openSpotDescription_description">
+	set(ptplugin[description].descID, %1);
+	openKolorArea_description();
+</action>
+
+<action name="closeDescription_description">
+	set(ptplugin[description].currentGroup, false);
+	if(%1,
+		set(restore_description, true);
+	,
+		set(restore_description, false);
+	);
+	closeKolorArea_description();
+</action> 
+
+<action name="showDescription_description">
+	if(ptplugin[description].canStart,
+		set(ptplugin[description].descID, get(scene[get(xml.scene)].descriptionid));
+		if(ptplugin[description].descID == null,
+			set(ptplugin[description].descID, "");
+		);
+		if(ptplugin[description].descID != "",
+			openDescription_description();
+		,
+			hideKolorArea_description(false);
+		);
+		set(ptplugin[description].startMethod, "");
+	);
+</action>
+
+
+<action name="refreshPanoDescription_description">
+	set(ptplugin[description].descID, get(scene[get(xml.scene)].descriptionid));
+	if(ptplugin[description].descID == null,
+		set(ptplugin[description].descID, "");
+	);
+	if(ptplugin[description].descID != "",
+		if(ptplugin[description].isOpen,
+			js(invokePluginFunction(description, updateKolorArea, get(ptplugin[description].descID)));
+		,
+			if(restore_description,
+				showDescription_description();
+			);
+		);
+	,
+		if(tour_displayinfo,
+			delayedcall(0.1,showTourInfo();
+);
+		);
+		closeDescription_description(get(ptplugin[description].isOpen));
+	);
+</action>
+
+<action name="onNewPano_description">
+	if(ptplugin[description].newPano,
+		if(ptplugin[description].startMethod == "",
+			if(ptplugin[description].isOpen,
+				refreshPanoDescription_description();
+			,
+				if(tour_displaycontrols,
+				if(tour_displayinfo,
+				showDescription_description();
+				,
+				refreshPanoDescription_description();
+				);
+				);
+			);
+		);
+	);
+	set(ptplugin[description].newPano, true);
+</action>
+
+<action name="changeLanguage_description">
+	if(ptplugin[description].jsready,
+		stopdelayedcall(delay_description);
+		js(invokePluginFunction(description, changeLanguage, true));
+	,
+		delayedcall(delay_description, 0.1, changeLanguage_description(););
+	);
+</action>
+
+<events name="kolorAreaEvents_description" 
+	keep="true"
+	onTourStart="set(ptplugin[description].canStart, true);if(ptplugin[description].openatstart,if(tour_displaycontrols,showTourInfo();
+););"
+	onshowtourinfo="if(tour_displayinfo,showDescription_description(););"
+	onhidetourinfo="if(ptplugin[description].isOpen,closeDescription_description(false););"
+	onnewpano="onNewPano_description();"
+	hidetourcontrols="if(ptplugin[description].isOpen,hideKolorArea_description(false););"
+	showtourcontrols="if(tour_displayinfo,if(ptplugin[description].isOpen,showKolorArea_description(false);,showDescription_description();););"
+	changetourlanguage="changeLanguage_description();"
+/>
+
+<!-- ********** -->
+<!-- PanotourMaps -->
+<!-- id : panotourmaps -->
+<!-- ********** -->
+
+		<ptplugin name="panotourmaps" lat="61.075169444444" lng="50.080794444444" zoom="11" maptypelayer="satellite" openatstart="false" state="false" bgcolor="f2f2f2" zorder="5" centeronspots="true" engine="KolorMap">
+	
+		<radar visible="false" radius="8000" linktozoom="true" quality="8" linecolor="ffffff" lineopacity="0.50000762951094835" linewidth="1" fillcolor="ffffff" fillopacity="0.30000762951094834" />
+		
+		<markers animation="" />
+		
+		
+		<controls zoom="true" pan="true" scale="false" maptype="true" overview="false">
+			<ui draggable="true" scrollable="true" dblclick="true" />
+			<specific />
+		</controls>
+		
+		<markerSelected name="" heading="" fov="" />
+		
+		
+			<!-- PanotourMaps markers counter : 4 -->
+
+
+
+				<marker name="spotmap219" 
+					lat="61.075169444444" 
+					lng="50.080794444444" 
+					heading="0" 
+					draggable="false" 
+					animated="true" 
+					desc="spotmap219_tooltip" 
+					desctype="info" 
+					onhover="false" 
+					isscene="true" 
+					scene="pano63" 
+					hasradar="true" 
+					jsclick="spotmap219ActionSpotMap">
+					<markericon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconwidth="32" iconheight="32" shadow="false" iconanchor="center" />
+				</marker>
+
+
+
+				<marker name="spotmap220" 
+					lat="61.075916666667" 
+					lng="50.085675" 
+					heading="0" 
+					draggable="false" 
+					animated="true" 
+					desc="spotmap220_tooltip" 
+					desctype="info" 
+					onhover="false" 
+					isscene="true" 
+					scene="pano64" 
+					hasradar="true" 
+					jsclick="spotmap220ActionSpotMap">
+					<markericon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconwidth="32" iconheight="32" shadow="false" iconanchor="center" />
+				</marker>
+
+
+
+				<marker name="spotmap221" 
+					lat="61.077263888889" 
+					lng="50.080519444444" 
+					heading="0" 
+					draggable="false" 
+					animated="true" 
+					desc="spotmap221_tooltip" 
+					desctype="info" 
+					onhover="false" 
+					isscene="true" 
+					scene="pano65" 
+					hasradar="true" 
+					jsclick="spotmap221ActionSpotMap">
+					<markericon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconwidth="32" iconheight="32" shadow="false" iconanchor="center" />
+				</marker>
+
+
+
+				<marker name="spotmap222" 
+					lat="61.075363888889" 
+					lng="50.080166666667" 
+					heading="0" 
+					draggable="false" 
+					animated="true" 
+					desc="spotmap222_tooltip" 
+					desctype="info" 
+					onhover="false" 
+					isscene="true" 
+					scene="pano61" 
+					hasradar="true" 
+					jsclick="spotmap222ActionSpotMap">
+					<markericon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconwidth="32" iconheight="32" shadow="false" iconanchor="center" />
+				</marker>
+		
+
+
+		
+	</ptplugin>
+	
+	<action name="kolorMapJsReady_panotourmaps">
+		set(ptplugin[panotourmaps].jsready, true);
+	</action>
+	
+	<ptplugin name="panotourmapsArea" engine="kolorArea">
+	<settings>
+		<option name="position" value="topright" type="string" />
+		<option name="start_position" value="left" type="string" />
+		<option name="margin_x" value="0" type="int" />
+		<option name="margin_y" value="0" type="int" />
+		<option name="background_color" value="f2f2f2" type="string" />
+		<option name="background_alpha" value="1" type="float" />
+		<option name="padding" value="0" type="int" />
+		<option name="topleft_radius" value="0" type="int" />
+		<option name="topright_radius" value="0" type="int" />
+		<option name="bottomleft_radius" value="0" type="int" />
+		<option name="bottomright_radius" value="0" type="int" />
+		<option name="area_border_width" value="0" type="int" />
+		<option name="area_border_color" value="f2f2f2" type="string" />
+		<option name="area_border_alpha" value="1" type="float" />
+		<option name="display_title" value="true" type="bool" />
+		<option name="title" value="panotourmapsmap_title" type="string" />
+		<option name="title_font" value="Verdana" type="string" />
+		<option name="title_size" value="14" type="int" />
+		<option name="title_weight" value="normal" type="string" />
+		<option name="title_decoration" value="normal" type="string" />
+		<option name="title_color" value="000000" type="string" />
+		<option name="close_displayed" value="false" type="bool" />
+		<option name="close_text" value="panotourmapsdisplay_close_text" type="string" />
+
+		<option name="overlay_displayed" value="false" type="bool" />
+		<option name="overlay_color" value="000000" type="string" />
+		<option name="overlay_alpha" value="0.50000762951094835" type="float" />
+
+		<option name="area_width" value="35" type="int" />
+		<option name="area_height" value="60" type="int" />
+		<option name="area_width_unit" value="percent" type="string" />
+		<option name="area_height_unit" value="percent" type="string" />
+		<option name="animation" value="false" type="bool" />
+		<option name="animation_duration" value="500" type="int" />
+		<option name="close_on_click" value="false" type="bool" />
+		<option name="refresh_content" value="false" type="bool" />
+		<option name="open_callback" value="addKolorMap('panotourmaps', [['googlev3','']], 'panotourmapsArea_mapDIV');" type="string" />
+		<option name="close_callback" value="invokeKrFunction('closeKolorAreaCallback_panotourmapsArea')" type="string" />
+		<option name="zorder" value="5" type="int" />
+		<option name="use_i18n" value="true" type="bool" />
+	</settings>
+	</ptplugin>
+	
+	<action name="kolorAreaJsReady_panotourmapsArea">
+		set(ptplugin[panotourmapsArea].jsready, true);
+
+	</action>
+	
+	<action name="openKolorArea_panotourmapsArea">
+		ifnot(ptplugin[panotourmapsArea].isOpen,
+			set(ptplugin[panotourmapsArea].isOpen, true);
+			pauseautorotation(forceplugin);
+
+			js(showKolorArea(panotourmapsArea, &lt;div id="panotourmapsArea_mapDIV"&gt;&lt;/div&gt;));
+			js(invokePluginFunction(panotourmaps, forceResizeMapLayer, panotourmapsArea_mapDIV));
+			events.dispatch(onremovedisplayedobject);
+		);
+	</action>
+	
+	<action name="closeKolorArea_panotourmapsArea">
+		if(ptplugin[panotourmapsArea].isOpen,
+			js(invokePluginFunction(panotourmapsArea, closeKolorArea));
+		);
+	</action>
+	
+	<action name="toggleKolorArea_panotourmapsArea">
+		if(ptplugin[panotourmapsArea].isOpen,
+			closeKolorArea_panotourmapsArea();
+		,
+			openKolorArea_panotourmapsArea();
+		);
+	</action>
+	
+	<action name="closeKolorAreaCallback_panotourmapsArea">
+		if(ptplugin[panotourmapsArea].isOpen,resumeautorotation(forceplugin);
+
+			
+		);
+		set(ptplugin[panotourmapsArea].isOpen, false);hideMap();
+
+	</action>
+	
+	<action name="showKolorArea_panotourmapsArea">
+		set(ptplugin[panotourmapsArea].isOpen, true);
+		pauseautorotation(forceplugin);
+
+		js(invokePluginFunction(panotourmapsArea, showKolorArea, %1));
+		js(invokePluginFunction(panotourmaps, forceResizeMapLayer, panotourmapsArea_mapDIV));
+		events.dispatch(onremovedisplayedobject);
+	</action> 
+		
+	<action name="hideKolorArea_panotourmapsArea">
+		resumeautorotation(forceplugin);
+
+		
+		set(ptplugin[panotourmapsArea].isOpen, false);
+		js(invokePluginFunction(panotourmapsArea, hideKolorArea, %1));
+	</action>
+	
+	
+	<action name="updateDefaultMarkerValues_panotourmapsArea">
+		if( ptplugin[panotourmaps].markerSelected.name != "",
+			set(ptplugin[panotourmaps].markerSelected.heading, get(view.hlookat));
+			set(ptplugin[panotourmaps].markerSelected.fov, get(view.hfov));
+		);
+		
+	</action>
+	
+	<action name="changeLanguage_panotourmaps">
+		if(ptplugin[panotourmaps].jsready,
+			stopdelayedcall(delay_panotourmaps);
+			js(invokePluginFunction(panotourmapsArea, changeLanguage, false));
+		,
+			delayedcall(delay_panotourmaps, 0.1, changeLanguage_panotourmaps(););
+		);
+	</action>
+	
+	<events name="kolorAreaEvents_panotourmapsArea" 
+		keep="true"
+		onhidetourmap="panotourmapsClosetourmap();" 
+		onshowtourmap="if(tour_displaymap,panotourmapsOpentourmap(););" 
+		
+		onTourStart="updateDefaultMarkerValues_panotourmapsArea();"
+		changetourlanguage="changeLanguage_panotourmaps();"
+	/>
+	
+	
+		<!-- PanotourMaps markers counter : 4 -->
+				<action name="spotmap219ActionSpotMap">
+          mainloadscene(pano63);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+				<action name="spotmap220ActionSpotMap">
+          mainloadscene(pano64);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+				<action name="spotmap221ActionSpotMap">
+          mainloadscene(pano65);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+				<action name="spotmap222ActionSpotMap">
+          mainloadscene(pano61);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+	
+
+
+	
+	
+	
+	<!-- Begin PanotourMaps events and actions -->
+	<events name="panotourmapsEvents" 
+	onxmlcomplete="ifnot(panotourmapsMapLoaded,set(tour_displaymap,false););" 
+	onnewpano="panotourmapsActivateDefaultMarker();" 
+	onviewchanged="panotourmapsOnviewchange()" 
+	keep="true" />
+	
+	
+	<krpano panotourmapsMarkerDefaultSet="false" />
+	<krpano panotourmapsMapLoaded="false" />
+	
+	
+	
+	<action name="panotourmapsClosetourmap">
+		if(ptplugin[panotourmapsArea].isOpen,
+			closeKolorArea_panotourmapsArea();
+		);
+	</action>
+	
+	<action name="panotourmapsHidetourmap">
+		ifnot(ptplugin[panotourmapsArea].isOpen,
+			panotourmapsClosetourmap();
+		,
+			hideKolorArea_panotourmapsArea(false);
+		);
+	</action>
+	
+	<action name="panotourmapsOpentourmap">
+		ifnot(ptplugin[panotourmapsArea].isOpen,
+			openKolorArea_panotourmapsArea();
+		);
+	</action>
+	
+	<action name="panotourmapsShowtourmap">
+		ifnot(ptplugin[panotourmapsArea].isOpen,
+			panotourmapsOpentourmap();
+		,
+			showKolorArea_panotourmapsArea(false);
+		);
+	</action>
+	
+	<action name="panotourmapsChangescene">
+		mainloadscene(%1);if(xml.scene != %1,panotourmapsGoMarker(%2););
+	</action>
+	
+	<action name="panotourmapsOnviewchange">
+		if ( panotourmapsMapLoaded == true,
+			updateDefaultMarkerValues_panotourmapsArea();
+		);
+	</action>
+	
+	<action name="panotourmapsGoMarker">
+		if ( panotourmapsMapLoaded == true,
+			
+			set(ptplugin[panotourmaps].markerSelected.name, %1);
+			set(ptplugin[panotourmaps].markerSelected.heading, get(view.hlookat));
+			set(ptplugin[panotourmaps].markerSelected.fov, get(view.hfov));
+			js(invokePluginFunction(panotourmaps, changeCurrentMarker, %1, get(view.hlookat), get(view.hfov), get(ptplugin[panotourmaps].centeronspots)));
+			
+			if( panotourmapsMarkerDefaultSet == false,
+				js(setMapDefaultMarker(panotourmaps, %1, get(view.hlookat), get(view.hfov)));
+				set(panotourmapsMarkerDefaultSet,true);
+			);
+		);
+	</action>
+	
+	<action name="panotourmapsUnselectMarker">
+		set(ptplugin[panotourmaps].markerSelected.name, "");
+		js(invokePluginFunction(panotourmaps, unselectCurrentMarker));
+		
+		js(setMapDefaultMarker(panotourmaps, null, null, null));
+	</action>
+
+	<action name="panotourmapsActivateDefaultMarker">
+		set(panotourmapsMapLoaded, true);
+		
+		set(panotourmapsMapSpotFound, false);
+		set(defaultmarkerinc_wait,50);
+		for(set(defaultmarkerinc,0), defaultmarkerinc LT ptplugin[panotourmaps].marker.count , inc(defaultmarkerinc),
+			if(defaultmarkerinc_wait == defaultmarkerinc,
+				add(defaultmarkerinc_wait,50);
+				wait(0);
+			);
+			if(ptplugin[panotourmaps].marker[get(defaultmarkerinc)].isscene == true,
+				if(panotourmapsMapSpotFound == false,
+					if(ptplugin[panotourmaps].marker[get(defaultmarkerinc)].scene == xml.scene,
+						ifnot(ptplugin[panotourmaps].marker[get(defaultmarkerinc)].name == ptplugin[panotourmaps].markerSelected.name,
+							panotourmapsGoMarker(get(ptplugin[panotourmaps].marker[get(defaultmarkerinc)].name));
+						);
+						set(panotourmapsMapSpotFound, true);
+					);
+				);
+			);
+		);
+		
+		if(panotourmapsMapSpotFound == false,
+			panotourmapsUnselectMarker();
+		);
+	</action>
+
+
+<action name="setViewArchitectural">
+	if(normalViewActivated,stopSetViewTweens(););
+	if(current_view_isflat === true,
+		setViewNonFlat(VFOV);
+	);
+	setViewArchitecturalComplete();
+</action>
+
+<action name="setViewArchitecturalComplete">
+	set(view.fovmax, get(panoview.fovmax));
+	set(view.fisheyefovlink, 0.5);
+	tween(view.architectural, 1.0, distance(1.0, 0.45));
+	tween(view.pannini, 0.0, distance(1.0, 0.45), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	tween(view.fisheye, 0.0, distance(1.0, 0.45), easeOutQuad, 
+		set(view.stereographic,false);
+		tween(view.vlookat, get(panoview.v), distance(90, 0.45));
+	);
+	tween(view.fov, get(panoview.fov), distance(50, 0.45));
+</action>
+
+<action name="setViewLittlePlanet">
+	set(sceneisfull360, false);
+	if(scene[get(xml.scene)].full360,
+		sub(viewhfov, panoview.hmax, panoview.hmin);
+		if (viewhfov == 360,
+			sub(viewvfov, panoview.vmax, panoview.vmin);
+			if (viewvfov == 180,
+				set(sceneisfull360, true);
+			);
+		);
+	);
+	if (sceneisfull360 AND (device.webgl OR device.flash),
+		if(normalViewActivated,stopSetViewTweens(););
+		if(current_view_isflat === true,
+			setViewNonFlat(VFOV);
+		);
+		setViewLittlePlanetComplete();
+	);
+</action>
+
+<action name="setViewLittlePlanetComplete">
+	set(backtonormalfirst,false);
+	if(view.pannini GE 1.0, set(backtonormalfirst,true));
+	if(view.stereographic == false, set(backtonormalfirst,true));
+	if(backtonormalfirst, hideTooltip();tween(view.fisheye, 0.0 ,distance(1.0, 0.25), easeOutQuad, WAIT); );
+	set(view.stereographic, true);
+	set(view.fisheyefovlink, 1.5);
+	tween(view.architectural, 0.0, 0.25);
+	tween(view.vlookat, 90, distance(179, 1.50));
+	tween(view.pannini, 0.0, distance(1.0, 0.75), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	if(panoview.fovmax LE 150, set(view.fovmax, 150); , set(view.fovmax, get(panoview.fovmax)); );
+	tween(view.fisheye, 1.0, distance(1.0, 0.75));
+	tween(view.fov, 150, distance(179, 0.75));
+</action>
+
+  <!-- MAP -->
+  <action name="hideMap">set(tour_displaymap, false);events.dispatch(onhidetourmap);</action>
+  <action name="showMap">set(tour_displaymap, true); events.dispatch(onshowtourmap);</action>
+
+<action name="setViewNormal">
+	stopSetViewTweens();
+	if(current_view_isflat === true,
+		setViewNonFlat(VFOV);
+	);
+	setViewNormalComplete();
+</action>
+
+<action name="setViewNormalComplete">
+	set(view.fisheyefovlink, 0.5);
+	set(view.fovmax, get(panoview.fovmax));
+	tween(view.architectural, 0.0, distance(1.0, 0.45));
+	tween(view.pannini, 0.0, distance(1.0, 0.45), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	tween(view.vlookat, get(panoview.v), distance(90, 0.45));
+	tween(view.fov, get(panoview.fov), distance(50, 0.45));
+	tween(view.fisheye, 0.0, distance(1.0, 0.45),
+		set(view.stereographic,false);
+	);
+</action>
+
+<krpano normalViewActivated="true" />
+<action name="stopSetViewTweens">
+	stoptween(view.fov);
+	stoptween(view.vlookat);
+	stoptween(view.fisheye);
+	stoptween(view.architectural);
+	stoptween(view.pannini);
+</action>
+
+  <!-- Fullscreen Management -->
+  <action name="exitFullScreen" devices="fullscreensupport">set(tour_fullscreen,false);js(setFullscreen(false));</action>
+  <action name="enterFullScreen" devices="fullscreensupport">set(tour_fullscreen,true);js(setFullscreen(true));</action>
+  <action name="switchFullScreen">if(tour_fullscreen,exitFullScreen();,enterFullScreen(););</action>
+
+  
+  <events name="krpanoExitFullscreenEvent"
+    onexitfullscreen="if(tour_fullscreen,exitFullScreenChangeEvent(););"
+    keep="true" />
+
+  <action name="exitFullScreenChangeEvent" devices="fullscreensupport">set(tour_fullscreen,false);events.dispatch(onexitfullscreen);</action>
+  <action name="enterFullScreenChangeEvent" devices="fullscreensupport">set(tour_fullscreen,true);events.dispatch(onenterfullscreen);</action>
+  <action name="exitFullScreenFallback">set(fullscreen,false);</action>
+  <action name="enterFullScreenFallback">set(fullscreen,true);</action>
+  
+  <action name="resizeFullScreenEvent">delayedcall(0,updatescreen(););</action>
+
+  <!-- Tour Information -->
+  <action name="hideTourInfo">set(tour_displayinfo, false);events.dispatch(onhidetourinfo);</action>
+  <action name="showTourInfo">set(tour_displayinfo, true); events.dispatch(onshowtourinfo);</action>
+
+
+</krpano>
